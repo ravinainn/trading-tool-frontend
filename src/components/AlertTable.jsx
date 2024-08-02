@@ -12,13 +12,24 @@ const Table = () => {
   ]);
   const [quotes, setQuotes] = useState({});
 
+  const showCustomAlert = (symbol, price) => {
+    setAlertMessage(`Alert for ${symbol}: Price ${price}`);
+    setIsAlertVisible(true);
+    playAlertSound();
+  };
+
   useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission();
+    }
     const alertData = async () => {
       const response = await fetch("http://127.0.0.1:5000/get_alerts");
       const alertData = await response.json();
+      // console.log(alertData);
 
       // Convert data to array of objects
       const formattedData = alertData.map((item) => ({
+        alertId: item[0],
         symbol: item[1],
         currPrice: item[0],
         alertPrice: item[2],
@@ -32,11 +43,22 @@ const Table = () => {
   useEffect(() => {
     const establishWebSocketConnection = async () => {
       const ws = new WebSocket("ws://localhost:8765");
-
       ws.onmessage = (event) => {
+        console.log("hello");
+
         const quote = JSON.parse(event.data);
-        // console.log(quote);
+        console.log(quote);
         setQuotes((prevQuotes) => ({ ...prevQuotes, [quote.symbol]: quote }));
+
+        // showDesktopNotification("TCS.NS", 3000);     // For testing
+        if (quote.alerts && quote.alerts.length > 0) {
+          quote.alerts.forEach((q) => {
+            const alertPrice = data.find((ele) => ele.alertId === q);
+            if (alertPrice) {
+              showDesktopNotification(quote.symbol, alertPrice);
+            }
+          });
+        }
       };
 
       ws.onclose = () => {
@@ -50,6 +72,23 @@ const Table = () => {
 
     establishWebSocketConnection();
   }, []);
+
+  const showDesktopNotification = (symbol, alertPrice) => {
+    console.log("Notification permission:", Notification.permission);
+    if ("Notification" in window && Notification.permission === "granted") {
+      const notificationTitle = `Alert for ${symbol}`;
+      const notificationBody =
+        typeof alertPrice === "number"
+          ? `Alert Price: ${alertPrice}`
+          : "Alert triggered";
+      console.log(
+        "Creating notification:",
+        notificationTitle,
+        notificationBody
+      );
+      new Notification(notificationTitle, { body: notificationBody });
+    }
+  };
 
   const addRvolColumn = () => {
     if (rvolDays && !isNaN(rvolDays)) {

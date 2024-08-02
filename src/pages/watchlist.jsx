@@ -6,7 +6,7 @@ import CustomWatchlist from "../components/CustomWatchlist";
 const WatchList = () => {
   return (
     <div className="w-full flex justify-center my-20">
-      <CustomWatchlist />
+      {/* <CustomWatchlist /> */}
       <div className="w-1/2  flex flex-col items-center ">
         <h1 className="text-4xl font-semibold ">Alert WatchList</h1>
         <Table />
