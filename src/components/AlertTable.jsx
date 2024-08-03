@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 
+import CustomTicker from "./CustomTicker";
+
 const Table = () => {
   const [data, setData] = useState([]);
   const [showRvolInput, setShowRvolInput] = useState(false);
   const [rvolDays, setRvolDays] = useState("");
-  const [columns, setColumns] = useState(["symbol", "currPrice", "alertPrice", "RVol50"]);
+  const [columns, setColumns] = useState([
+    "symbol",
+    "currPrice",
+    "alertPrice",
+    "RVol50",
+  ]);
   const [quotes, setQuotes] = useState({});
 
   useEffect(() => {
@@ -37,9 +44,12 @@ const Table = () => {
 
         if (quote.alerts && quote.alerts.length > 0) {
           quote.alerts.forEach((q) => {
-            const alertPrice = data.find((ele) => ele.alertId === q);
-            if (alertPrice) {
-              showDesktopNotification(quote.symbol, alertPrice);
+            const alertItem = data.find((ele) => ele.alertId === q);
+
+            if (alertItem && alertItem.alertPrice) {
+              showDesktopNotification(quote.symbol, alertItem.alertPrice);
+            } else {
+              console.log("Alert item or alert price not found for alertId:");
             }
           });
         }
@@ -65,10 +75,28 @@ const Table = () => {
   }, [data]);
 
   const showDesktopNotification = (symbol, alertPrice) => {
+    console.log(Notification.permission);
     if ("Notification" in window && Notification.permission === "granted") {
       const notificationTitle = `Alert for ${symbol}`;
-      const notificationBody = typeof alertPrice === "number" ? `Alert Price: ${alertPrice}` : "Alert triggered";
+      console.log(alertPrice);
+      const notificationBody =
+        typeof alertPrice === "number"
+          ? `Alert Price: ${alertPrice}`
+          : "Alert triggered";
+      console.log(notificationBody);
+      alert(notificationBody);
+      try {
+        new Notification(notificationTitle, {
+          body: notificationBody,
+        });
+        console.log("Notification created successfully");
+        const audio = new Audio("/noti.mp3");
+        audio.play().catch((e) => console.error("Error playing sound:", e));
+      } catch (error) {
+        console.error("Error creating notification:", error);
+      }
       new Notification(notificationTitle, { body: notificationBody });
+      console.log("hello");
     }
   };
 
@@ -107,11 +135,19 @@ const Table = () => {
         </thead>
         <tbody>
           {data.map((row, index) => (
-            <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+            <tr
+              key={index}
+              className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+            >
               <td className="border border-gray-300 p-2">{row.symbol}</td>
-              <td className="border border-gray-300 p-2">{quotes[row.symbol] && quotes[row.symbol].price}</td>
+              <td className="border border-gray-300 p-2">
+                {quotes[row.symbol] &&
+                  Math.round(quotes[row.symbol].price * 100) / 100}
+              </td>
               <td className="border border-gray-300 p-2">{row.alertPrice}</td>
-              <td className="border border-gray-300 p-2">{quotes[row.symbol] && quotes[row.symbol].rvol_50}</td>
+              <td className="border border-gray-300 p-2">
+                {quotes[row.symbol] && quotes[row.symbol].rvol_50}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -119,7 +155,10 @@ const Table = () => {
 
       <div className="mt-4">
         {!showRvolInput ? (
-          <button onClick={() => setShowRvolInput(true)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          <button
+            onClick={() => setShowRvolInput(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
             Add RVOL Column
           </button>
         ) : (
@@ -131,12 +170,16 @@ const Table = () => {
               placeholder="Enter number of days"
               className="border border-gray-300 p-2 mr-2 rounded"
             />
-            <button onClick={addRvolColumn} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+            <button
+              onClick={addRvolColumn}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
               Add
             </button>
           </div>
         )}
       </div>
+      <CustomTicker />
     </div>
   );
 };
