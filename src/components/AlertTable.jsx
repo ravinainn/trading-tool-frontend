@@ -117,6 +117,8 @@ const Table = () => {
 
   return (
     <div className="container mx-auto p-4">
+    <CustomTicker />
+    <br></br>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -179,7 +181,7 @@ const Table = () => {
           </div>
         )}
       </div>
-      <CustomTicker />
+      
     </div>
   );
 };

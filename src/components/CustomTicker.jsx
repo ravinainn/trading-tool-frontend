@@ -8,10 +8,10 @@ const CustomTicker = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/Yfinance_direct_alert",
+        "http://127.0.0.1:5000/yfinance_direct_alert",
         {
           symbol: symbol,
-          alert_price: alert,
+          price: alert,
         }
       );
       console.log("Response:", response.data);
