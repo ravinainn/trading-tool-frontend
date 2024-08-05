@@ -4,7 +4,7 @@ import axios from "axios";
 const CustomWatchlist = () => {
   const [watchlists, setWatchlists] = useState([]);
   const [newWatchlistName, setNewWatchlistName] = useState("");
-  const [newStockSymbol, setNewStockSymbol] = useState("");
+  const [watchlistInputs, setWatchlistInputs] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,8 +17,13 @@ const CustomWatchlist = () => {
     setError(null);
     try {
       const response = await axios.get("http://127.0.0.1:5000/get_watchlists");
-      // console.log(response.data.watchlists);
       setWatchlists(response.data.watchlists);
+      // Initialize inputs for each watchlist
+      const inputs = response.data.watchlists.reduce((acc, watchlist) => {
+        acc[watchlist.watchlistname] = "";
+        return acc;
+      }, {});
+      setWatchlistInputs(inputs);
     } catch (error) {
       console.error("Error fetching watchlists:", error);
       setError("Failed to fetch watchlists. Please try again later.");
@@ -55,6 +60,7 @@ const CustomWatchlist = () => {
   };
 
   const handleAddStock = async (watchlistName) => {
+    const newStockSymbol = watchlistInputs[watchlistName];
     if (newStockSymbol.trim() === "") return;
 
     try {
@@ -67,7 +73,7 @@ const CustomWatchlist = () => {
       );
       console.log(response);
       console.log(response.data);
-      setNewStockSymbol("");
+      setWatchlistInputs((prev) => ({ ...prev, [watchlistName]: "" }));
       fetchWatchlists();
     } catch (error) {
       console.error("Error adding stock:", error);
@@ -86,14 +92,6 @@ const CustomWatchlist = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading watchlists...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <div className="border-r-2 w-1/2 p-4">
       <h1 className="text-4xl font-semibold mb-4">Custom WatchList</h1>
@@ -110,7 +108,7 @@ const CustomWatchlist = () => {
         </button>
       </form>
       {watchlists.length === 0 ? (
-        <p>No Watclist Found. Create a new Watchlist </p>
+        <p>No Watchlist Found. Create a new Watchlist </p>
       ) : (
         watchlists.map((watchlist, index) => (
           <div key={index} className="mb-8">
@@ -134,8 +132,13 @@ const CustomWatchlist = () => {
             >
               <input
                 type="text"
-                value={newStockSymbol}
-                onChange={(e) => setNewStockSymbol(e.target.value)}
+                value={watchlistInputs[watchlist.watchlistname] || ""}
+                onChange={(e) =>
+                  setWatchlistInputs((prev) => ({
+                    ...prev,
+                    [watchlist.watchlistname]: e.target.value,
+                  }))
+                }
                 placeholder="Enter stock symbol"
                 className="border p-2 mr-2"
               />

@@ -84,7 +84,7 @@ const Table = () => {
           ? `Alert Price: ${alertPrice}`
           : "Alert triggered";
       console.log(notificationBody);
-      alert(notificationBody);
+      // alert(notificationBody);
       try {
         new Notification(notificationTitle, {
           body: notificationBody,
@@ -117,8 +117,8 @@ const Table = () => {
 
   return (
     <div className="container mx-auto p-4">
-    <CustomTicker />
-    <br></br>
+      <CustomTicker />
+      <br></br>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -181,7 +181,6 @@ const Table = () => {
           </div>
         )}
       </div>
-      
     </div>
   );
 };
