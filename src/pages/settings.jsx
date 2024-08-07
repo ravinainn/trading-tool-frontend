@@ -1,131 +1,64 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+// import axios from "axios";
 
 const Settings = () => {
-  const [tags, setTags] = useState(["a", "b"]);
-  const [newTag, setNewTag] = useState({ name: "", color: "#000000" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [tagName, setTagName] = useState("");
+  const [tagColor, setTagColor] = useState("#000000");
 
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  const fetchTags = async () => {
-    try {
-      const response = await axios.get("http://127.0.0.1:5000/get_tags");
-      setTags(response.data.tags);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to fetch tags");
-      setLoading(false);
-    }
-  };
-
-  const handleAddTag = async (e) => {
+  const addTag = (e) => {
     e.preventDefault();
-    try {
-      await axios.post("http://127.0.0.1:5000/add_tag", newTag);
-      setNewTag({ name: "", color: "#000000" });
-      fetchTags();
-    } catch (err) {
-      setError("Failed to add tag");
+    if (tagName.trim()) {
+      setTags([...tags, { name: tagName, color: tagColor }]);
+      setTagName("");
+      setTagColor("#000000");
     }
   };
 
-  const handleUpdateTag = async (id, updatedTag) => {
-    try {
-      await axios.post(`http://127.0.0.1:5000/update_tag/${id}`, updatedTag);
-      fetchTags();
-    } catch (err) {
-      setError("Failed to update tag");
-    }
+  const deleteTag = (index) => {
+    setTags(tags.filter((_, i) => i !== index));
   };
-
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full flex flex-col p-20 bg-gray-100">
-      <div className="w-4/5 flex flex-col gap-8 bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-semibold text-gray-800">Set Priority</h1>
+    <div className="container mx-auto p-4">
+      <form onSubmit={addTag} className="mb-4">
+        <input
+          type="text"
+          value={tagName}
+          onChange={(e) => setTagName(e.target.value)}
+          placeholder="Tag name"
+          className="border p-2 mr-2"
+        />
+        <input
+          type="color"
+          value={tagColor}
+          onChange={(e) => setTagColor(e.target.value)}
+          className="mr-2"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Add Tag
+        </button>
+      </form>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h4 className="text-xl font-medium mb-4 text-gray-700">
-            Add New Tag:
-          </h4>
-          <form onSubmit={handleAddTag} className="flex gap-4 items-end">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="tagName" className="text-sm text-gray-600">
-                Tag Name:
-              </label>
-              <input
-                id="tagName"
-                type="text"
-                value={newTag.name}
-                onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
-                placeholder="Enter Tag"
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="tagColor" className="text-sm text-gray-600">
-                Tag Color:
-              </label>
-              <input
-                id="tagColor"
-                type="color"
-                value={newTag.color}
-                onChange={(e) =>
-                  setNewTag({ ...newTag, color: e.target.value })
-                }
-                className="h-10 w-20 border rounded"
-              />
-            </div>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag, index) => (
+          <div
+            key={index}
+            style={{ backgroundColor: tag.color }}
+            className="flex items-center px-3 py-1 rounded text-white"
+          >
+            <span>{tag.name}</span>
             <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+              onClick={() => deleteTag(index)}
+              className="ml-2 text-xs bg-red-500 rounded-full w-4 h-4 flex items-center justify-center"
             >
-              Add Tag
+              ×
             </button>
-          </form>
-        </div>
-
-        <div>
-          <h4 className="text-xl font-medium mb-4 text-gray-700">
-            Existing Tags:
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tags.map((tag) => (
-              <div
-                key={tag.id}
-                className="flex items-center gap-4 bg-gray-50 p-4 rounded-md"
-              >
-                <div
-                  className="w-8 h-8 rounded-full"
-                  style={{ backgroundColor: tag.color }}
-                ></div>
-                <input
-                  type="text"
-                  value={tag.name}
-                  onChange={(e) =>
-                    handleUpdateTag(tag.id, { ...tag, name: e.target.value })
-                  }
-                  className="border rounded px-3 py-1 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-                <input
-                  type="color"
-                  value={tag.color}
-                  onChange={(e) =>
-                    handleUpdateTag(tag.id, { ...tag, color: e.target.value })
-                  }
-                  className="h-8 w-14 border rounded"
-                />
-              </div>
-            ))}
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

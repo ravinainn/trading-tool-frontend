@@ -93,7 +93,7 @@ const CustomWatchlist = () => {
   };
 
   return (
-    <div className="border-r-2 w-1/2 p-4">
+    <div className="border-r-2  p-4">
       <h1 className="text-4xl font-semibold mb-4">Custom WatchList</h1>
       <form onSubmit={handleCreateWatchlist} className="mb-4">
         <input

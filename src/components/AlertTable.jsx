@@ -2,6 +2,29 @@ import React, { useEffect, useState } from "react";
 
 import CustomTicker from "./CustomTicker";
 
+const dummyTags = [
+  { name: "Urgent", color: "#FF0000" },
+  { name: "Personal", color: "#FFA500" },
+  { name: "Work", color: "#0000FF" },
+  { name: "Family", color: "#800080" },
+  { name: "Health", color: "#008000" },
+  { name: "Finance", color: "#00FF00" },
+  { name: "Education", color: "#FFFF00" },
+  { name: "Hobby", color: "#FFC0CB" },
+  { name: "Travel", color: "#00FFFF" },
+  { name: "Food", color: "#8B4513" },
+  { name: "Sports", color: "#FF4500" },
+  { name: "Technology", color: "#808080" },
+  { name: "Music", color: "#4B0082" },
+  { name: "Art", color: "#FF1493" },
+  { name: "Books", color: "#2E8B57" },
+  { name: "Movies", color: "#DA70D6" },
+  { name: "Pets", color: "#8B008B" },
+  { name: "Shopping", color: "#FF69B4" },
+  { name: "Gardening", color: "#32CD32" },
+  { name: "Fitness", color: "#FF6347" },
+];
+
 const Table = () => {
   const [data, setData] = useState([]);
   const [showRvolInput, setShowRvolInput] = useState(false);
