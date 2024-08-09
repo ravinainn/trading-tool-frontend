@@ -1,22 +1,53 @@
-import React, { useState } from "react";
-// import axios from "axios";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const Settings = () => {
   const [tags, setTags] = useState([]);
   const [tagName, setTagName] = useState("");
   const [tagColor, setTagColor] = useState("#000000");
 
-  const addTag = (e) => {
+  const getTags = async () => {
+    const response = await axios.get(
+      "https://trading-tool-e65y.onrender.com/get_tags"
+    );
+    console.log("123");
+
+    console.log(response.data);
+
+    setTags(response.data.tags);
+  };
+  useEffect(() => {
+    getTags();
+  }, []);
+
+  const addTag = async (e) => {
     e.preventDefault();
-    if (tagName.trim()) {
-      setTags([...tags, { name: tagName, color: tagColor }]);
+    try {
+      await axios
+        .post("https://trading-tool-e65y.onrender.com/create_tag", {
+          tag_name: tagName,
+          tag_color: tagColor,
+        })
+        .then((res) => {
+          console.log(res);
+          console.log(res.data);
+        });
+      getTags();
+      // setTags([...tags, { tagId: 1, name: tagName, color: tagColor }]);
       setTagName("");
       setTagColor("#000000");
-    }
+    } catch (error) {}
   };
 
-  const deleteTag = (index) => {
-    setTags(tags.filter((_, i) => i !== index));
+  const deleteTag = async (tagId) => {
+    try {
+      await axios.post("https://trading-tool-e65y.onrender.com/delete_tag", {
+        tag_id: tagId,
+      });
+      getTags();
+    } catch (error) {
+      console.error("Error deleting tag:", error);
+    }
   };
 
   return (
@@ -47,12 +78,12 @@ const Settings = () => {
         {tags.map((tag, index) => (
           <div
             key={index}
-            style={{ backgroundColor: tag.color }}
+            style={{ backgroundColor: tag.tagcolor }}
             className="flex items-center px-3 py-1 rounded text-white"
           >
-            <span>{tag.name}</span>
+            <span>{tag.tagname}</span>
             <button
-              onClick={() => deleteTag(index)}
+              onClick={() => deleteTag(tag.tagid)}
               className="ml-2 text-xs bg-red-500 rounded-full w-4 h-4 flex items-center justify-center"
             >
               ×

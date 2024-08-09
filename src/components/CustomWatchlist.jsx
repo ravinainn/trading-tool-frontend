@@ -16,7 +16,9 @@ const CustomWatchlist = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://127.0.0.1:5000/get_watchlists");
+      const response = await axios.get(
+        "https://trading-tool-e65y.onrender.com/get_watchlists"
+      );
       setWatchlists(response.data.watchlists);
       // Initialize inputs for each watchlist
       const inputs = response.data.watchlists.reduce((acc, watchlist) => {
@@ -37,7 +39,7 @@ const CustomWatchlist = () => {
     if (newWatchlistName.trim() === "") return;
 
     try {
-      await axios.post("http://127.0.0.1:5000/add_watchlist", {
+      await axios.post("https://trading-tool-e65y.onrender.com/add_watchlist", {
         watchlist_name: newWatchlistName,
         symbols: [],
       });
@@ -50,9 +52,12 @@ const CustomWatchlist = () => {
 
   const handleDeleteWatchlist = async (watchlistName) => {
     try {
-      await axios.post("http://127.0.0.1:5000/delete_watchlist", {
-        watchlist_name: watchlistName,
-      });
+      await axios.post(
+        "https://trading-tool-e65y.onrender.com/delete_watchlist",
+        {
+          watchlist_name: watchlistName,
+        }
+      );
       fetchWatchlists();
     } catch (error) {
       console.error("Error deleting watchlist:", error);
@@ -65,7 +70,7 @@ const CustomWatchlist = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/add_watchlist_item",
+        "https://trading-tool-e65y.onrender.com/add_watchlist_item",
         {
           watchlist_name: watchlistName,
           symbol: newStockSymbol,
@@ -82,10 +87,13 @@ const CustomWatchlist = () => {
 
   const handleDeleteStock = async (watchlistName, stockSymbol) => {
     try {
-      await axios.post("http://127.0.0.1:5000/delete_watchlist_item", {
-        watchlist_name: watchlistName,
-        symbol: stockSymbol,
-      });
+      await axios.post(
+        "https://trading-tool-e65y.onrender.com/delete_watchlist_item",
+        {
+          watchlist_name: watchlistName,
+          symbol: stockSymbol,
+        }
+      );
       fetchWatchlists();
     } catch (error) {
       console.error("Error deleting stock:", error);

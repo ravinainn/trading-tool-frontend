@@ -8,7 +8,7 @@ const CustomTicker = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/yfinance_direct_alert",
+        "https://trading-tool-e65y.onrender.com/yfinance_direct_alert",
         {
           symbol: symbol,
           price: alert,
@@ -22,7 +22,7 @@ const CustomTicker = () => {
     }
   };
   return (
-    <form onClick={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
         value={symbol}
